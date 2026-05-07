@@ -1,6 +1,6 @@
 FROM php:8.4-cli
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -12,23 +12,29 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd
 
-# Install composer
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Working directory
 WORKDIR /var/www
 
-# Copy project files
+# Copy files
 COPY . .
 
-# Install dependencies
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions
+# Permissions
 RUN chmod -R 775 storage bootstrap/cache
 
-# Expose port
+# Laravel cache cleanup
+RUN php artisan config:clear || true
+RUN php artisan route:clear || true
+RUN php artisan cache:clear || true
+RUN php artisan view:clear || true
+
+# Expose Render port
 EXPOSE 10000
 
-# Start
-CMD php artisan migrate --force && php artisan optimize && php artisan serve --host=0.0.0.0 --port=10000
+# Start server
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT}

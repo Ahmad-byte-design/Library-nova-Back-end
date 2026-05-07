@@ -37,7 +37,9 @@ return [
             // 'accessToken' => env('GOOGLE_DRIVE_ACCESS_TOKEN'), // optional
             'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
             'folder' => env('GOOGLE_DRIVE_FOLDER'),
-            'serviceAccountCredentials' => env('GOOGLE_SERVICE_ACCOUNT_JSON'),
+            // 'serviceAccountCredentials' => env('GOOGLE_SERVICE_ACCOUNT_JSON'),
+            'serviceAccountCredentials' => json_decode(base64_decode(env('GOOGLE_SERVICE_ACCOUNT_BASE64')), true),
+
         ],
 
         'local' => [
